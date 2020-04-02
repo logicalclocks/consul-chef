@@ -21,3 +21,7 @@ default['consul']['retry_join']['tag_value']    = nil
 
 default['consul']['master']['bootstrap_expect'] = 1
 default['consul']['master']['ui']               = "true"
+
+default['consul']['health-check']['retryable-check-file'] = "#{node['consul']['bin_dir']}/retryable_health_check.sh"
+default['consul']['health-check']['max-attempts']         = 7
+default['consul']['health-check']['multiplier']           = 1.2

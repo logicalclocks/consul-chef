@@ -124,3 +124,10 @@ bash "export security env variables for client" do
     EOH
     not_if "grep CONSUL_TLS_SERVER_NAME #{node['consul']['home']}"
 end
+
+template node['consul']['health-check']['retryable-check-file'] do
+    source "retryable_health_check.sh.erb"
+    owner node['consul']['user']
+    group node['consul']['group']
+    mode 0755
+end

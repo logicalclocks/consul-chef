@@ -57,7 +57,7 @@ end
 directory node['consul']['home'] do
     owner node['consul']['user']
     group node['consul']['group']
-    mode "750"
+    mode "751"
 end
 
 directory node['consul']['conf_dir'] do
@@ -75,7 +75,7 @@ end
 directory node['consul']['bin_dir'] do
     owner node['consul']['user']
     group node['consul']['group']
-    mode "750"
+    mode "751"
 end
 
 basename = File.basename(node['consul']['bin_url'])
@@ -98,5 +98,6 @@ bash "unzip Consul" do
         set -e
         rm -f #{node['consul']['bin_dir']}/consul
         unzip #{cached_file} -d #{node['consul']['bin_dir']}
+        chmod 750 #{node['consul']['bin_dir']}/consul
     EOH
 end

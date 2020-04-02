@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+MAX_ATTEMPTS=<%= node['consul']['health-check']['max-attempts'] %>
+MULTIPLIER=<%= node['consul']['health-check']['multiplier'] %>
+
+# Helper function to run a health check
+# Function will keep retrying to ping a
+# service if it's dead until it reaches
+# a maximum number of attempts
+_run_health_check () {
+    attempt=0
+    sleep=1
+    while [ $attempt -lt $MAX_ATTEMPTS ]
+    do
+        eval $1
+        result=$?
+        if [[ $result -eq 0 ]];
+        then
+            exit 0
+        fi
+	    ((attempt++))
+        sleep=$(echo "$sleep * $MULTIPLIER" | bc)
+        sleep "$sleep"
+    done
+
+    exit $result
+}

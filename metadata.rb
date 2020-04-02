@@ -72,3 +72,11 @@ attribute "consul/master/bootstrap_expect",
 attribute "consul/master/ui",
           :description => "Flag to enable/disable the web UI",
           :type => 'string'
+
+attribute "consul/health-check/max-attempts",
+          :description => "Maximum number of attempts to retry the health check script before giving up",
+          :type => 'string'
+
+attribute "consul/health-check/multiplier",
+          :description => "If a health check fails it will retry for max-attempts before being declared as dead. This attribute controls the sleep interval between consecutive attempts",
+          :type => 'string'
