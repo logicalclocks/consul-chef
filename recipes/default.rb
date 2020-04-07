@@ -71,17 +71,24 @@ if node['consul']['use_dnsmasq'].casecmp("true")
             else
                 effective_resolv_conf = node['consul']['effective_resolv_conf']
             end
+            dnsmasq_resolv_dir = "/srv/dnsmasq"
+            dnsmasq_resolv_file = "#{dnsmasq_resolv_dir}/resolv.conf"
+            directory dnsmasq_resolv_dir do	
+                owner 'root'	
+                group 'root'	
+                mode '755'	
+                action	
+            end
             bash "copy resolv.conf to dnsmasq directory" do
                 user 'root'
                 group 'root'
                 code <<-EOH
                     set -e
-                    cp #{effective_resolv_conf} /etc/dnsmasq.d
+                    cp #{effective_resolv_conf} #{dnsmasq_resolv_dir}
                 EOH
                 notifies :run, 'bash[configure-resolv.conf]', :immediately
-                not_if { ::File.exist?('/var/run/dnsmasq/resolv.conf') }
+                not_if { ::File.exist?(dnsmasq_resolv_file) }
             end
-            resolv_conf = "/etc/dnsmasq.d/resolv.conf"
 
             template "/etc/dnsmasq.d/default" do
                 source "dnsmasq-conf.erb"
@@ -89,7 +96,7 @@ if node['consul']['use_dnsmasq'].casecmp("true")
                 group 'root'
                 mode 0755
                 variables({
-                    :resolv_conf => resolv_conf,
+                    :resolv_conf => dnsmasq_resolv_file,
                     :dnsmasq_ip => "127.0.0.1,#{my_ip}",
                     :kubernetes_dns => kubernetes_dns,
                     :kubernetes_domain_name => kubernetes_domain_name
