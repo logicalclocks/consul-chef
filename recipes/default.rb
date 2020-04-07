@@ -66,12 +66,6 @@ if node['consul']['use_dnsmasq'].casecmp("true")
                 action [:restart]
             end
         when "rhel"
-            directory "/var/run/dnsmasq" do
-                owner 'root'
-                group 'root'
-                mode '755'
-                action
-            end
             if node['consul']['effective_resolv_conf'].empty?
                 effective_resolv_conf = "/etc/resolv.conf"
             else
@@ -82,12 +76,12 @@ if node['consul']['use_dnsmasq'].casecmp("true")
                 group 'root'
                 code <<-EOH
                     set -e
-                    cp #{effective_resolv_conf} /var/run/dnsmasq
+                    cp #{effective_resolv_conf} /etc/dnsmasq.d
                 EOH
                 notifies :run, 'bash[configure-resolv.conf]', :immediately
                 not_if { ::File.exist?('/var/run/dnsmasq/resolv.conf') }
             end
-            resolv_conf = "/var/run/dnsmasq/resolv.conf"
+            resolv_conf = "/etc/dnsmasq.d/resolv.conf"
 
             template "/etc/dnsmasq.d/default" do
                 source "dnsmasq-conf.erb"
