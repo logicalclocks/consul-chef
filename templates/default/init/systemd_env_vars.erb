@@ -1,4 +1,4 @@
-CONSUL_CACERT=<%= node["kagent"]["certs"]["root_ca"]%>
-CONSUL_CLIENT_CERT=<%= node["kagent"]["certs_dir"] %>/pub.pem
-CONSUL_CLIENT_KEY=<%= node["kagent"]["certs_dir"] %>/priv.key
+CONSUL_CACERT=<%= @hops_ca %>
+CONSUL_CLIENT_CERT=<%= @certificate %>
+CONSUL_CLIENT_KEY=<%= @key %>
 CONSUL_HTTP_ADDR=https://127.0.0.1:<%= node['consul']['http_api_port'] %>

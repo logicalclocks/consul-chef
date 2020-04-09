@@ -10,10 +10,16 @@ class ConsulHelper
     end
 
     def get_service(name, tags)
-        raw_certificate = File.read @node['kagent']['certs']['elastic_host_certificate']
+        x509_helper = X509Helper.new @node
+        crypto_dir = x509_helper.get_crypto_dir(@node['consul']['user'])
+        hops_ca = "#{crypto_dir}/#{x509_helper.get_hops_ca_bundle_name()}"
+        certificate = "#{crypto_dir}/#{x509_helper.get_certificate_bundle_name(@node['consul']['user'])}"
+        key = "#{crypto_dir}/#{x509_helper.get_private_key_pkcs8_name(@node['consul']['user'])}"
+
+        raw_certificate = File.read certificate
         certificate = OpenSSL::X509::Certificate.new raw_certificate
 
-        raw_key = File.read @node['kagent']['certs']['host_key']
+        raw_key = File.read key
         key = OpenSSL::PKey::RSA.new raw_key
 
         Net::HTTP.start(

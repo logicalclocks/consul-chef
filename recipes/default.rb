@@ -152,11 +152,21 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
     end
 end
 
+crypto_dir = x509_helper.get_crypto_dir(node['consul']['user'])
+hops_ca = "#{crypto_dir}/#{x509_helper.get_hops_ca_bundle_name()}"
+certificate = "#{crypto_dir}/#{x509_helper.get_certificate_bundle_name(node['consul']['user'])}"
+key = "#{crypto_dir}/#{x509_helper.get_private_key_pkcs8_name(node['consul']['user'])}"
+
 template "#{node['consul']['conf_dir']}/systemd_env_vars" do
     source "init/systemd_env_vars.erb"
     owner node['consul']['user']
     group node['consul']['group']
     mode 0750
+    variables({
+        :hops_ca => hops_ca,
+        :certificate => certificate,
+        :key => key
+    })
 end
 
 consul_tls_server_name = node['install']['localhost'].casecmp?("true") ? "localhost" : "$(hostname -f | tr -d '[:space:]')"
@@ -165,9 +175,9 @@ bash "export security env variables for client" do
     group node['consul']['group']
     cwd node['consul']['home']
     code <<-EOH
-        echo "export CONSUL_CACERT=#{node["kagent"]["certs"]["root_ca"]}" >> .bashrc
-        echo "export CONSUL_CLIENT_CERT=#{node["kagent"]["certs_dir"]}/pub.pem" >> .bashrc
-        echo "export CONSUL_CLIENT_KEY=#{node["kagent"]["certs_dir"]}/priv.key" >> .bashrc
+        echo "export CONSUL_CACERT=#{hops_ca}" >> .bashrc
+        echo "export CONSUL_CLIENT_CERT=#{certificate}" >> .bashrc
+        echo "export CONSUL_CLIENT_KEY=#{key}" >> .bashrc
         echo "export CONSUL_HTTP_ADDR=https://127.0.0.1:#{node['consul']['http_api_port']}" >> .bashrc
         echo "export CONSUL_TLS_SERVER_NAME=#{consul_tls_server_name}" >> .bashrc
     EOH

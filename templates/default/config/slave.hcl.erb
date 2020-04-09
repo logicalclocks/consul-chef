@@ -13,9 +13,9 @@ verify_server_hostname = false
 auto_encrypt = {
    allow_tls = true
 }
-ca_file = "<%= node["kagent"]["certs"]["root_ca"] %>"
-cert_file = "<%= node["kagent"]["certs"]["elastic_host_certificate"] %>"
-key_file = "<%= node["kagent"]["certs_dir"] %>/priv.key"
+ca_file = "<%= @hops_ca %>"
+cert_file = "<%= @certificate %>"
+key_file = "<%= @key %>"
 ports = {
    http = -1,
    https = <%= node['consul']['http_api_port'] %>

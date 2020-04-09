@@ -33,19 +33,6 @@ group hops_group do
     not_if { node['install']['external_users'].casecmp("true") == 0 }
 end
 
-group node['kagent']['certs_group'] do
-    action :create
-    not_if "getent group #{node['kagent']['certs_group']}"
-    not_if { node['install']['external_users'].casecmp("true") == 0 }
-end
-
-group node['kagent']['certs_group'] do
-    action :modify
-    members ["#{node['consul']['user']}"]
-    append true
-    not_if { node['install']['external_users'].casecmp("true") == 0 }
-end
-
 directory node['consul']['dir']  do
     owner node['consul']['user']
     group node['consul']['group']
