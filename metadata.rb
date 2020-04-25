@@ -65,10 +65,6 @@ attribute "consul/retry_join/tag_value",
           :description => "Cloud Auto-join tag_value to join Consul master agent",
           :type => 'string'
 
-attribute "consul/master/bootstrap_expect",
-          :description => "Number of Consul masters to wait before it starts serving requests",
-          :type => 'string'
-
 attribute "consul/master/ui",
           :description => "Flag to enable/disable the web UI",
           :type => 'string'
