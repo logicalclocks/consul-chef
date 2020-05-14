@@ -1,8 +1,8 @@
 # Install and configure dnsmasq
-if node['consul']['use_dnsmasq'].casecmp("true")
+if node['consul']['use_dnsmasq'].casecmp?("true")
     package 'dnsmasq'
 
-    if node['consul']['configure_resolv_conf'].casecmp("true") &&  ! ::File.exist?('/etc/dnsmasq.d/default')
+    if node['consul']['configure_resolv_conf'].casecmp?("true") &&  ! ::File.exist?('/etc/dnsmasq.d/default')
 
         kubernetes_dns = nil
         kubernetes_domain_name = nil
@@ -19,7 +19,11 @@ if node['consul']['use_dnsmasq'].casecmp("true")
             end
 
         end
-        my_ip = my_private_ip()
+        if node['install']['localhost'].casecmp?("true")
+            my_ip = "127.0.0.1"
+        else
+            my_ip = my_private_ip()
+        end
         # Disable systemd-resolved for Ubuntu
         case node["platform_family"]
         when "debian"
@@ -49,6 +53,12 @@ if node['consul']['use_dnsmasq'].casecmp("true")
                 EOH
             end
 
+            if node['install']['localhost'].casecmp?("true")
+                dnsmasq_ip = "127.0.0.2"
+            else
+                dnsmasq_ip = "127.0.0.2,#{my_ip}"
+            end
+
             template "/etc/dnsmasq.d/default" do
                 source "dnsmasq-conf.erb"
                 owner 'root'
@@ -56,7 +66,7 @@ if node['consul']['use_dnsmasq'].casecmp("true")
                 mode 0755
                 variables({
                     :resolv_conf => nil,
-                    :dnsmasq_ip => "127.0.0.2,#{my_ip}",
+                    :dnsmasq_ip => dnsmasq_ip,
                     :kubernetes_dns => kubernetes_dns,
                     :kubernetes_domain_name => kubernetes_domain_name
                 })
@@ -103,6 +113,12 @@ if node['consul']['use_dnsmasq'].casecmp("true")
                 not_if { ::File.exist?(dnsmasq_resolv_file) }
             end
 
+            if node['install']['localhost'].casecmp?("true")
+                dnsmasq_ip = "127.0.0.1"
+            else
+                dnsmasq_ip = "127.0.0.1,#{my_ip}"
+            end
+
             template "/etc/dnsmasq.d/default" do
                 source "dnsmasq-conf.erb"
                 owner 'root'
@@ -110,7 +126,7 @@ if node['consul']['use_dnsmasq'].casecmp("true")
                 mode 0755
                 variables({
                     :resolv_conf => dnsmasq_resolv_file,
-                    :dnsmasq_ip => "127.0.0.1,#{my_ip}",
+                    :dnsmasq_ip => dnsmasq_ip,
                     :kubernetes_dns => kubernetes_dns,
                     :kubernetes_domain_name => kubernetes_domain_name
                 })
@@ -143,6 +159,7 @@ template "#{node['consul']['conf_dir']}/systemd_env_vars" do
     mode 0750
 end
 
+consul_tls_server_name = node['install']['localhost'].casecmp?("true") ? "localhost" : "$(hostname -f | tr -d '[:space:]')"
 bash "export security env variables for client" do
     user node['consul']['user']
     group node['consul']['group']
@@ -152,7 +169,7 @@ bash "export security env variables for client" do
         echo "export CONSUL_CLIENT_CERT=#{node["kagent"]["certs_dir"]}/pub.pem" >> .bashrc
         echo "export CONSUL_CLIENT_KEY=#{node["kagent"]["certs_dir"]}/priv.key" >> .bashrc
         echo "export CONSUL_HTTP_ADDR=https://127.0.0.1:#{node['consul']['http_api_port']}" >> .bashrc
-        echo "export CONSUL_TLS_SERVER_NAME=$(hostname -f | tr -d '[:space:]')" >> .bashrc
+        echo "export CONSUL_TLS_SERVER_NAME=#{consul_tls_server_name}" >> .bashrc
     EOH
     not_if "grep CONSUL_TLS_SERVER_NAME #{node['consul']['home']}"
 end
