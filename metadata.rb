@@ -11,7 +11,7 @@ chef_version '>= 12.1' if respond_to?(:chef_version)
 
 depends 'conda'
 depends 'kagent'
-
+depends 'hops'
 
 attribute "consul/user",
           :description => "System user to run the service",
