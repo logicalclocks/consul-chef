@@ -141,6 +141,7 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
                     rm -f /etc/resolv.conf
                     echo "nameserver #{my_ip}" > /etc/resolv.conf
                     chmod 644 /etc/resolv.conf
+                    chattr +i /etc/resolv.conf
                 EOH
                 action :nothing
             end
