@@ -6,7 +6,7 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
 
         kubernetes_dns = nil
         kubernetes_domain_name = nil
-        if node['install']['enterprise']['install'].casecmp?("true") and node['install']['kubernetes'].casecmp?("true")
+        if node['install']['enterprise']['install'].casecmp?("true") and node['install']['kubernetes'].casecmp?("true") and node['install']['managed_kubernetes'].casecmp?("false")
             kubernetes_dns = "10.96.0.10"
             kubernetes_domain_name = "cluster.local"
             if node.attribute?('kube-hops')
