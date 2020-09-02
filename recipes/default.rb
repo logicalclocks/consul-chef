@@ -26,15 +26,6 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
         end
 
         case node["platform_family"]
-        when "debian"
-            # Disable systemd-resolved for ubuntu. 
-            # systemd-resolved listens on a local interface (127.0.0.53) which makes that 
-            # consul. domains are not resolvable from inside Docker containers on K8s.
-            # Moreover, for what we use of systemd-resolved and dnsmasq the two are 
-            # overlapping. 
-            systemd_unit "systemd-resolved.service" do
-                action [:stop, :disable]
-            end
         when "rhel"
             # We need to disable SELinux as by default it does not allow creating
             # file watches which is needed by dnsmasq.
