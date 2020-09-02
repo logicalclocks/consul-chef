@@ -101,6 +101,12 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
         systemd_unit "dnsmasq.service" do
             action :restart
         end
+
+        # if debian, restart systemd-resolved so it realizes the configuration changes
+        systemd_unit "systemd-resolved.service" do 
+            action :restart
+            only_if node['platform_family'].eql?("debian")
+        end
     end
 end
 
