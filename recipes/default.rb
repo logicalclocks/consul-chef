@@ -24,56 +24,16 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
         else
             my_ip = my_private_ip()
         end
-        # Disable systemd-resolved for Ubuntu
+
         case node["platform_family"]
         when "debian"
-            # Follow steps from here https://github.com/hashicorp/terraform-aws-consul/tree/master/modules
-            package "iptables-persistent"
-
-            bash "Set debconf" do
-                user 'root'
-                group 'root'
-                code <<-EOH
-                    echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
-                    echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
-                EOH
-            end
-
-            bash "Configure systemd-resolved" do
-                user 'root'
-                group 'root'
-                code <<-EOH
-                    set -e
-                    iptables -t nat -A OUTPUT -d localhost -p udp -m udp --dport 53 -j REDIRECT --to-ports 8600
-                    iptables -t nat -A OUTPUT -d localhost -p tcp -m tcp --dport 53 -j REDIRECT --to-ports 8600
-                    iptables-save | tee /etc/iptables/rules.v4
-                    ip6tables-save | sudo tee /etc/iptables/rules.v6
-                    sed -i "s/#DNS=/DNS=127.0.0.2/g" /etc/systemd/resolved.conf
-                    sed -i "s/#Domains=/Domains=~#{node['consul']['domain']}/g" /etc/systemd/resolved.conf
-                EOH
-            end
-
-            if node['install']['localhost'].casecmp?("true")
-                dnsmasq_ip = "127.0.0.2"
-            else
-                dnsmasq_ip = "127.0.0.2,#{my_ip}"
-            end
-
-            template "/etc/dnsmasq.d/default" do
-                source "dnsmasq-conf.erb"
-                owner 'root'
-                group 'root'
-                mode 0755
-                variables({
-                    :resolv_conf => nil,
-                    :dnsmasq_ip => dnsmasq_ip,
-                    :kubernetes_dns => kubernetes_dns,
-                    :kubernetes_domain_name => kubernetes_domain_name
-                })
-            end
-
+            # Disable systemd-resolved for ubuntu. 
+            # systemd-resolved listens on a local interface (127.0.0.53) which makes that 
+            # consul. domains are not resolvable from inside Docker containers on K8s.
+            # Moreover, for what we use of systemd-resolved and dnsmasq the two are 
+            # overlapping. 
             systemd_unit "systemd-resolved.service" do
-                action [:restart]
+                action [:stop, :disable]
             end
         when "rhel"
             # We need to disable SELinux as by default it does not allow creating
@@ -88,63 +48,63 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
                   sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
                 EOH
             end
+        end
 
-            if node['consul']['effective_resolv_conf'].empty?
-                effective_resolv_conf = "/etc/resolv.conf"
-            else
-                effective_resolv_conf = node['consul']['effective_resolv_conf']
-            end
-            dnsmasq_resolv_dir = "/srv/dnsmasq"
-            dnsmasq_resolv_file = "#{dnsmasq_resolv_dir}/resolv.conf"
-            directory dnsmasq_resolv_dir do	
-                owner 'root'	
-                group 'root'	
-                mode '755'	
-                action	
-            end
-            bash "copy resolv.conf to dnsmasq directory" do
-                user 'root'
-                group 'root'
-                code <<-EOH
-                    set -e
-                    cp #{effective_resolv_conf} #{dnsmasq_resolv_dir}
-                EOH
-                notifies :run, 'bash[configure-resolv.conf]', :immediately
-                not_if { ::File.exist?(dnsmasq_resolv_file) }
-            end
+        if node['consul']['effective_resolv_conf'].empty?
+            effective_resolv_conf = "/etc/resolv.conf"
+        else
+            effective_resolv_conf = node['consul']['effective_resolv_conf']
+        end
+        dnsmasq_resolv_dir = "/srv/dnsmasq"
+        dnsmasq_resolv_file = "#{dnsmasq_resolv_dir}/resolv.conf"
+        directory dnsmasq_resolv_dir do	
+            owner 'root'	
+            group 'root'	
+            mode '755'	
+            action	
+        end
+        bash "copy resolv.conf to dnsmasq directory" do
+            user 'root'
+            group 'root'
+            code <<-EOH
+                set -e
+                cp #{effective_resolv_conf} #{dnsmasq_resolv_dir}
+            EOH
+            notifies :run, 'bash[configure-resolv.conf]', :immediately
+            not_if { ::File.exist?(dnsmasq_resolv_file) }
+        end
 
-            if node['install']['localhost'].casecmp?("true")
-                dnsmasq_ip = "127.0.0.1"
-            else
-                dnsmasq_ip = "127.0.0.1,#{my_ip}"
-            end
+        if node['install']['localhost'].casecmp?("true")
+            dnsmasq_ip = "127.0.0.1"
+        else
+            dnsmasq_ip = "127.0.0.1,#{my_ip}"
+        end
 
-            template "/etc/dnsmasq.d/default" do
-                source "dnsmasq-conf.erb"
-                owner 'root'
-                group 'root'
-                mode 0755
-                variables({
-                    :resolv_conf => dnsmasq_resolv_file,
-                    :dnsmasq_ip => dnsmasq_ip,
-                    :kubernetes_dns => kubernetes_dns,
-                    :kubernetes_domain_name => kubernetes_domain_name
-                })
-            end
+        template "/etc/dnsmasq.d/default" do
+            source "dnsmasq-conf.erb"
+            owner 'root'
+            group 'root'
+            mode 0755
+            variables({
+                :resolv_conf => dnsmasq_resolv_file,
+                :dnsmasq_ip => dnsmasq_ip,
+                :kubernetes_dns => kubernetes_dns,
+                :kubernetes_domain_name => kubernetes_domain_name
+            })
+        end
 
-            bash "configure-resolv.conf" do
-                user 'root'
-                group 'root'
-                code <<-EOH
-                    set -e
-                    cp /etc/resolv.conf /etc/resolv.conf.bak
-                    rm -f /etc/resolv.conf
-                    echo "nameserver #{my_ip}" > /etc/resolv.conf
-                    chmod 644 /etc/resolv.conf
-                    chattr +i /etc/resolv.conf
-                EOH
-                action :nothing
-            end
+        bash "configure-resolv.conf" do
+            user 'root'
+            group 'root'
+            code <<-EOH
+                set -e
+                cp /etc/resolv.conf /etc/resolv.conf.bak
+                rm -f /etc/resolv.conf
+                echo "nameserver #{my_ip}" > /etc/resolv.conf
+                chmod 644 /etc/resolv.conf
+                chattr +i /etc/resolv.conf
+            EOH
+            action :nothing
         end
 
         systemd_unit "dnsmasq.service" do
