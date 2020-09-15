@@ -18,7 +18,13 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
                 end
             end
         end
-        
+       
+        if node['install']['localhost'].casecmp?("true")
+            my_ip = "127.0.0.1"
+        else
+            my_ip = my_private_ip()
+        end
+
         # Disable systemd-resolved for Ubuntu
         case node["platform_family"]
         when "debian"
@@ -49,7 +55,7 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
             end
 
             if node['install']['localhost'].casecmp?("true")
-                dnsmasq_ips = "127.0.0.2,127.0.0.1"
+                dnsmasq_ips = "127.0.0.2"
             else
                 dnsmasq_ips = "127.0.0.2,#{my_private_ip()}"
             end
