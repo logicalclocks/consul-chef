@@ -17,13 +17,14 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
                     kubernetes_domain_name = node['kube-hops']['cluster_domain']
                 end
             end
-
         end
+       
         if node['install']['localhost'].casecmp?("true")
             my_ip = "127.0.0.1"
         else
             my_ip = my_private_ip()
         end
+
         # Disable systemd-resolved for Ubuntu
         case node["platform_family"]
         when "debian"
@@ -48,15 +49,15 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
                     iptables -t nat -A OUTPUT -d localhost -p tcp -m tcp --dport 53 -j REDIRECT --to-ports 8600
                     iptables-save | tee /etc/iptables/rules.v4
                     ip6tables-save | sudo tee /etc/iptables/rules.v6
-                    sed -i "s/#DNS=/DNS=127.0.0.2/g" /etc/systemd/resolved.conf
+                    sed -i "s/#DNS=/DNS=#{my_private_ip()}/g" /etc/systemd/resolved.conf
                     sed -i "s/#Domains=/Domains=~#{node['consul']['domain']}/g" /etc/systemd/resolved.conf
                 EOH
             end
 
             if node['install']['localhost'].casecmp?("true")
-                dnsmasq_ip = "127.0.0.2"
+                dnsmasq_ips = "127.0.0.2"
             else
-                dnsmasq_ip = "127.0.0.2,#{my_ip}"
+                dnsmasq_ips = "127.0.0.2,#{my_private_ip()}"
             end
 
             template "/etc/dnsmasq.d/default" do
@@ -66,7 +67,7 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
                 mode 0755
                 variables({
                     :resolv_conf => nil,
-                    :dnsmasq_ip => dnsmasq_ip,
+                    :dnsmasq_ip => dnsmasq_ips,
                     :kubernetes_dns => kubernetes_dns,
                     :kubernetes_domain_name => kubernetes_domain_name
                 })
