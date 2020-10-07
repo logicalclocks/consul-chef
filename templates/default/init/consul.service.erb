@@ -16,6 +16,7 @@ ExecReload=/bin/bash -c "CONSUL_TLS_SERVER_NAME=<%= @consul_tls_server_name %> <
 KillMode=process
 Restart=on-failure
 LimitNOFILE=65536
+RestartSec=1
 
 [Install]
 WantedBy=multi-user.target
