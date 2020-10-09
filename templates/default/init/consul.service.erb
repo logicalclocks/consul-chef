@@ -4,6 +4,8 @@ Documentation=https://www.consul.io/
 Requires=network-online.target
 After=network-online.target
 ConditionFileNotEmpty=<%= node['consul']['conf_dir'] %>/consul.hcl
+StartLimitIntervalSec=30
+StartLimitBurst=20
 
 [Service]
 EnvironmentFile=<%= node['consul']['conf_dir'] %>/systemd_env_vars
@@ -14,6 +16,7 @@ ExecReload=/bin/bash -c "CONSUL_TLS_SERVER_NAME=<%= @consul_tls_server_name %> <
 KillMode=process
 Restart=on-failure
 LimitNOFILE=65536
+RestartSec=1
 
 [Install]
 WantedBy=multi-user.target
