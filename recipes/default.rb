@@ -40,6 +40,12 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
                 EOH
             end
 
+            if node['install']['localhost'].casecmp?("true")
+                dnsmasq_ip = "127.0.0.2"
+            else
+                dnsmasq_ip = my_private_ip()
+            end
+
             bash "Configure systemd-resolved" do
                 user 'root'
                 group 'root'
@@ -49,7 +55,7 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
                     iptables -t nat -A OUTPUT -d localhost -p tcp -m tcp --dport 53 -j REDIRECT --to-ports 8600
                     iptables-save | tee /etc/iptables/rules.v4
                     ip6tables-save | sudo tee /etc/iptables/rules.v6
-                    sed -i "s/#DNS=/DNS=#{my_private_ip()}/g" /etc/systemd/resolved.conf
+                    sed -i "s/#DNS=/DNS=#{dnsmasq_ip}/g" /etc/systemd/resolved.conf
                     sed -i "s/#Domains=/Domains=~#{node['consul']['domain']}/g" /etc/systemd/resolved.conf
                 EOH
             end
