@@ -55,9 +55,18 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
                     iptables -t nat -A OUTPUT -d localhost -p tcp -m tcp --dport 53 -j REDIRECT --to-ports 8600
                     iptables-save | tee /etc/iptables/rules.v4
                     ip6tables-save | sudo tee /etc/iptables/rules.v6
-                    sed -i "s/#DNS=/DNS=#{dnsmasq_ip}/g" /etc/systemd/resolved.conf
-                    sed -i "s/#Domains=/Domains=~#{node['consul']['domain']}/g" /etc/systemd/resolved.conf
                 EOH
+            end
+
+            template '/etc/systemd/resolved.conf' do
+                source 'resolved.conf.erb'
+                owner 'root'
+                group 'root'
+                mode '0755'
+                action :create
+                variables ({
+                    :dnsmasq_ip => dnsmasq_ip,
+                })
             end
 
             if node['install']['localhost'].casecmp?("true")
