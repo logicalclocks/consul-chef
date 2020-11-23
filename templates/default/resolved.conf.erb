@@ -14,7 +14,7 @@
 [Resolve]
 DNS=<%= @dnsmasq_ip %>
 #FallbackDNS=
-Domains=<%= node['consul']['domain'] %>
+Domains=~<%= node['consul']['domain'] %>
 #LLMNR=no
 #MulticastDNS=no
 #DNSSEC=yes
