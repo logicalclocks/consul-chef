@@ -13,4 +13,13 @@ if node["kagent"]["enabled"].casecmp?("true")
     hopsworks_alt_url hopsworks_alt_url
     action :generate_x509
   end
+else
+  # Create just the user directory without generating the certificates
+  # It is needed when joining managed NDB nodes in Hopsworks cluster
+  kagent_hopsify "Create user x.509 directory" do
+    user node['consul']['user']
+    crypto_directory x509_helper.get_crypto_dir(node['consul']['user'])
+    hopsworks_alt_url hopsworks_alt_url
+    action :create_user_directory
+  end
 end
