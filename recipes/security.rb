@@ -19,7 +19,6 @@ else
   kagent_hopsify "Create user x.509 directory" do
     user node['consul']['user']
     crypto_directory x509_helper.get_crypto_dir(node['consul']['user'])
-    hopsworks_alt_url hopsworks_alt_url
     action :create_user_directory
   end
 end
