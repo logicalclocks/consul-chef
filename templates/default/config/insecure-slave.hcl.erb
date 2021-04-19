@@ -1,12 +1,7 @@
 datacenter = "lc"
 domain = "<%= node['consul']['domain'] %>"
-server = true
-<% if !@masters.nil? -%>
-retry_join = <%= @masters %>
-<% end -%>
-bootstrap_expect = <%= @num_masters %>
-ui = <%= node['consul']['master']['ui'] %>
 data_dir = "<%= node['consul']['data_dir'] %>"
+retry_join = <%= @masters %>
 enable_local_script_checks = true
 performance = {
     raft_multiplier = 1
