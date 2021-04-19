@@ -75,3 +75,7 @@ attribute "consul/health-check/max-attempts",
 attribute "consul/health-check/multiplier",
           :description => "If a health check fails it will retry for max-attempts before being declared as dead. This attribute controls the sleep interval between consecutive attempts",
           :type => 'string'
+
+attribute "consul/security",
+          :description => "Default 'true'. Set to 'false' to disable certificate-based security in consul",
+          :type => 'string'

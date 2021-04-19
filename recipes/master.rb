@@ -13,12 +13,17 @@ else
     num_masters = 1
 end
 
-crypto_dir = x509_helper.get_crypto_dir(node['consul']['user'])
-hops_ca = "#{crypto_dir}/#{x509_helper.get_hops_ca_bundle_name()}"
-certificate = "#{crypto_dir}/#{x509_helper.get_certificate_bundle_name(node['consul']['user'])}"
-key = "#{crypto_dir}/#{x509_helper.get_private_key_pkcs8_name(node['consul']['user'])}"
+insecure=
+if node['consul']['security'].eql? "true"  
+  crypto_dir = x509_helper.get_crypto_dir(node['consul']['user'])
+  hops_ca = "#{crypto_dir}/#{x509_helper.get_hops_ca_bundle_name()}"
+  certificate = "#{crypto_dir}/#{x509_helper.get_certificate_bundle_name(node['consul']['user'])}"
+  key = "#{crypto_dir}/#{x509_helper.get_private_key_pkcs8_name(node['consul']['user'])}"
+else
+  insecure="insecure-"
+end
 template "#{node['consul']['conf_dir']}/consul.hcl" do
-    source "config/master.hcl.erb"
+    source "config/#{insecure}master.hcl.erb"
     owner node['consul']['user']
     group node['consul']['group']
     mode 0750

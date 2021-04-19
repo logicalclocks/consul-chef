@@ -1,3 +1,6 @@
+
+
+
 # Install and configure dnsmasq
 if node['consul']['use_dnsmasq'].casecmp?("true")
     package 'dnsmasq'
@@ -170,12 +173,18 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
 end
 
 crypto_dir = x509_helper.get_crypto_dir(node['consul']['user'])
-hops_ca = "#{crypto_dir}/#{x509_helper.get_hops_ca_bundle_name()}"
-certificate = "#{crypto_dir}/#{x509_helper.get_certificate_bundle_name(node['consul']['user'])}"
-key = "#{crypto_dir}/#{x509_helper.get_private_key_pkcs8_name(node['consul']['user'])}"
+
+insecure=
+if node['consul']['security'].eql? "true"  
+  hops_ca = "#{crypto_dir}/#{x509_helper.get_hops_ca_bundle_name()}"
+  certificate = "#{crypto_dir}/#{x509_helper.get_certificate_bundle_name(node['consul']['user'])}"
+  key = "#{crypto_dir}/#{x509_helper.get_private_key_pkcs8_name(node['consul']['user'])}"
+else
+  insecure="insecure-"
+end
 
 template "#{node['consul']['conf_dir']}/systemd_env_vars" do
-    source "init/systemd_env_vars.erb"
+    source "init/#{insecure}systemd_env_vars.erb"
     owner node['consul']['user']
     group node['consul']['group']
     mode 0750
@@ -186,8 +195,9 @@ template "#{node['consul']['conf_dir']}/systemd_env_vars" do
     })
 end
 
-consul_tls_server_name = node['install']['localhost'].casecmp?("true") ? "localhost" : "$(hostname -f | tr -d '[:space:]')"
-bash "export security env variables for client" do
+if node['consul']['security'].eql? "true"  
+  consul_tls_server_name = node['install']['localhost'].casecmp?("true") ? "localhost" : "$(hostname -f | tr -d '[:space:]')"
+  bash "export security env variables for client" do
     user node['consul']['user']
     group node['consul']['group']
     cwd node['consul']['home']
@@ -199,6 +209,7 @@ bash "export security env variables for client" do
         echo "export CONSUL_TLS_SERVER_NAME=#{consul_tls_server_name}" >> .bashrc
     EOH
     not_if "grep CONSUL_TLS_SERVER_NAME #{node['consul']['home']}"
+  end
 end
 
 template node['consul']['health-check']['retryable-check-file'] do

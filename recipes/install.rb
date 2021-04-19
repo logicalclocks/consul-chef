@@ -15,12 +15,13 @@ user node['consul']['user'] do
     not_if { node['install']['external_users'].casecmp("true") == 0 }
 end
 
+
 group node["kagent"]["certs_group"] do
-    action :manage
-    append true
-    excluded_members node['consul']['user']
-    not_if { node['install']['external_users'].casecmp("true") == 0 }
-    only_if { conda_helpers.is_upgrade }
+  action :manage
+  append true
+  excluded_members node['consul']['user']
+  not_if { node['install']['external_users'].casecmp("true") == 0 }
+  only_if { conda_helpers.is_upgrade }
 end
 
 hops_group = "hadoop"

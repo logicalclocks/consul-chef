@@ -24,3 +24,5 @@ default['consul']['master']['ui']               = "true"
 default['consul']['health-check']['retryable-check-file'] = "#{node['consul']['bin_dir']}/retryable_health_check.sh"
 default['consul']['health-check']['max-attempts']         = 7
 default['consul']['health-check']['multiplier']           = 1.2
+
+default['consul']['security']                   = "true"
