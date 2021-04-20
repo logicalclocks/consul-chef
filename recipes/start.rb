@@ -1,3 +1,9 @@
+insecure=
+if node['consul']['security'].eql? "false"
+  insecure="insecure-"
+end
+
+
 case node["platform_family"]
 when "debian"
     service_target = "/lib/systemd/system/consul.service"
@@ -18,7 +24,7 @@ else
 end
 
 template service_target do
-    source "init/consul.service.erb"
+    source "init/#{insecure}consul.service.erb"
     owner 'root'
     group 'root'
     mode 0644
