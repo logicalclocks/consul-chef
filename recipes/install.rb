@@ -1,4 +1,5 @@
 group node['consul']['group'] do
+    gid node['consul']['group_id']
     action :create
     not_if "getent group #{node['consul']['group']}"
     not_if { node['install']['external_users'].casecmp("true") == 0 }
@@ -6,6 +7,7 @@ end
 
 user node['consul']['user'] do
     home node['consul']['home']
+    uid node['consul']['user_id']
     gid node['consul']['group']
     system true
     shell "/bin/bash"
