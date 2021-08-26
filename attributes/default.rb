@@ -1,5 +1,7 @@
 default['consul']['user']                       = node['install']['user'].empty? ? 'consul' : node['install']['user']
+default['consul']['user_id']                    = '1500'
 default['consul']['group']                      = node['install']['user'].empty? ? 'consul' : node['install']['user']
+default['consul']['group_id']                   = '1500'
 default['consul']["dir"]                        = node['install']['dir'].empty? ? "/srv/hops" : node['install']['dir']
 default['consul']['home']                       = "#{node['consul']['dir']}/consul"
 default['consul']['conf_dir']                   = "#{node['consul']['home']}/consul.d"

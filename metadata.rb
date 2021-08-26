@@ -16,8 +16,16 @@ attribute "consul/user",
           :description => "System user to run the service",
           :type => 'string'
 
+attribute "consul/user_id",
+          :description => "Consul user ID. Default: 1500",
+          :type => 'string'
+
 attribute "consul/group",
           :description => "Group id of consul user",
+          :type => 'string'
+
+attribute "consul/group_id",
+          :description => "Consul group id. Default: 1500",
           :type => 'string'
 
 attribute "consul/bin_url",
