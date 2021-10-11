@@ -68,6 +68,10 @@ attribute "consul/master/ui",
           :description => "Flag to enable/disable the web UI",
           :type => 'string'
 
+attribute "consul/master/private_ips",
+          :description => "Set ip addresses",
+          :type => "array"
+
 attribute "consul/health-check/max-attempts",
           :description => "Maximum number of attempts to retry the health check script before giving up",
           :type => 'string'
