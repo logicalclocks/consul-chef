@@ -207,3 +207,10 @@ template node['consul']['health-check']['retryable-check-file'] do
     group node['consul']['group']
     mode 0755
 end
+
+cookbook_file "#{node['consul']['bin_dir']}/domain_utils.sh" do
+    source "domain_utils.sh"
+    owner node['consul']['user']
+    group node['consul']['group']
+    mode '0755'
+end
