@@ -17,6 +17,10 @@ default['consul']['http_api_port']              = "8501"
 default['consul']['domain']                     = "consul"
 
 default['consul']['bind_address']               = ""
+# Default bind to localhost but accepts any go-sockaddr template
+# For example, private IP address and localhost
+# {{ GetPrivateIP }} {{ GetAllInterfaces | include "flags" "loopback" | include "type" "ipv4" | join "address" " " }}
+default['consul']['client_address']             = "{{ GetAllInterfaces | include "flags" "loopback" | include "type" "ipv4" | join "address" " " }}"
 default['consul']['retry_join']['provider']     = node['install']['cloud']
 default['consul']['retry_join']['tag_key']      = nil
 default['consul']['retry_join']['tag_value']    = nil
