@@ -60,6 +60,10 @@ attribute "consul/bind_address",
           :description => "IP address Consul agent will bind to. You can also set a go-sockaddr template. Check https://www.consul.io/docs/agent/options.html#_bind for more information.",
           :type => 'string'
 
+attribute "consul/client_address",
+          :description => "IP address Consul client facing intefaces will bind to. You can also set a go-sockaddr template. Check https://www.consul.io/docs/agent/options.html#_bind for more information. Default: localhost",
+          :type => 'string'
+
 attribute "consul/retry_join/provider",
           :description => "Cloud provider for Cloud Auto-join, defaults to install/cloud",
           :type => 'string'
