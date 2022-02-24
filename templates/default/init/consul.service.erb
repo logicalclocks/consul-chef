@@ -11,7 +11,7 @@ StartLimitBurst=20
 EnvironmentFile=<%= node['consul']['conf_dir'] %>/systemd_env_vars
 User=<%= node['consul']['user'] %>
 Group=<%= node['consul']['group'] %>
-ExecStart=<%= node['consul']['bin_dir'] %>/consul agent -bind <%= @bind_address %> -config-dir=<%= node['consul']['conf_dir'] %>
+ExecStart=<%= node['consul']['bin_dir'] %>/consul agent -client '<%= node['consul']['client_address'] %>' -bind <%= @bind_address %> -config-dir=<%= node['consul']['conf_dir'] %>
 ExecReload=/bin/bash -c "CONSUL_TLS_SERVER_NAME=<%= @consul_tls_server_name %> <%= node['consul']['bin_dir'] %>/consul reload"
 KillMode=process
 Restart=on-failure
