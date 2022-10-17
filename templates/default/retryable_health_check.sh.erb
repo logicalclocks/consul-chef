@@ -23,5 +23,8 @@ _run_health_check () {
         sleep "$sleep"
     done
 
+    if [ -n "$EXIT_ERROR_CODE" ]; then
+	    exit $EXIT_ERROR_CODE
+    fi
     exit $result
 }
