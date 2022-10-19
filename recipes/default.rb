@@ -2,10 +2,17 @@
 if node['consul']['use_dnsmasq'].casecmp?("true")
     package 'dnsmasq'
 
-    if node['consul']['configure_resolv_conf'].casecmp?("true") &&  ! ::File.exist?('/etc/dnsmasq.d/default')
+    kubernetes_dns = nil
+    kubernetes_domain_name = nil
+    dnsmasq_resolv_file = nil
+    if node['install']['localhost'].casecmp?("true")
+        my_ip = "127.0.0.1"
+    else
+        my_ip = my_private_ip()
+    end
 
-        kubernetes_dns = nil
-        kubernetes_domain_name = nil
+    if node['consul']['configure_resolv_conf'].casecmp?("true")
+
         if node['install']['enterprise']['install'].casecmp?("true") and node['install']['kubernetes'].casecmp?("true") and node['install']['managed_kubernetes'].casecmp?("false")
             kubernetes_dns = "10.96.0.10"
             kubernetes_domain_name = "cluster.local"
@@ -17,12 +24,6 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
                     kubernetes_domain_name = node['kube-hops']['cluster_domain']
                 end
             end
-        end
-       
-        if node['install']['localhost'].casecmp?("true")
-            my_ip = "127.0.0.1"
-        else
-            my_ip = my_private_ip()
         end
 
         # Disable systemd-resolved for Ubuntu
@@ -69,42 +70,10 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
                 })
             end
 
-            if node['install']['localhost'].casecmp?("true")
-                dnsmasq_ips = "127.0.0.2"
-            else
-                dnsmasq_ips = "127.0.0.2,#{my_private_ip()}"
-            end
-
-            template "/etc/dnsmasq.d/default" do
-                source "dnsmasq-conf.erb"
-                owner 'root'
-                group 'root'
-                mode 0755
-                variables({
-                    :resolv_conf => nil,
-                    :dnsmasq_ip => dnsmasq_ips,
-                    :kubernetes_dns => kubernetes_dns,
-                    :kubernetes_domain_name => kubernetes_domain_name
-                })
-            end
-
             systemd_unit "systemd-resolved.service" do
                 action [:restart]
             end
         when "rhel"
-            # We need to disable SELinux as by default it does not allow creating
-            # file watches which is needed by dnsmasq.
-            # We need it disabled for Kubernetes too as it does not allow containers
-            # to access the host filesystem, which is required by pod networks for example.
-            bash 'disable_selinux' do
-                user 'root'
-                group 'root'
-                code <<-EOH
-                  setenforce 0
-                  sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
-                EOH
-            end
-
             if node['consul']['effective_resolv_conf'].empty?
                 effective_resolv_conf = "/etc/resolv.conf"
             else
@@ -129,25 +98,6 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
                 not_if { ::File.exist?(dnsmasq_resolv_file) }
             end
 
-            if node['install']['localhost'].casecmp?("true")
-                dnsmasq_ip = "127.0.0.1"
-            else
-                dnsmasq_ip = "127.0.0.1,#{my_ip}"
-            end
-
-            template "/etc/dnsmasq.d/default" do
-                source "dnsmasq-conf.erb"
-                owner 'root'
-                group 'root'
-                mode 0755
-                variables({
-                    :resolv_conf => dnsmasq_resolv_file,
-                    :dnsmasq_ip => dnsmasq_ip,
-                    :kubernetes_dns => kubernetes_dns,
-                    :kubernetes_domain_name => kubernetes_domain_name
-                })
-            end
-
             bash "configure-resolv.conf" do
                 user 'root'
                 group 'root'
@@ -161,10 +111,65 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
                 action :nothing
             end
         end
+    end
 
-        systemd_unit "dnsmasq.service" do
-            action :restart
+    case node["platform_family"]
+    when "debian"
+        if node['install']['localhost'].casecmp?("true")
+            dnsmasq_ips = "127.0.0.2"
+        else
+            dnsmasq_ips = "127.0.0.2,#{my_private_ip()}"
         end
+
+        template "/etc/dnsmasq.d/default" do
+            source "dnsmasq-conf.erb"
+            owner 'root'
+            group 'root'
+            mode 0755
+            variables({
+                :resolv_conf => nil,
+                :dnsmasq_ip => dnsmasq_ips,
+                :kubernetes_dns => kubernetes_dns,
+                :kubernetes_domain_name => kubernetes_domain_name
+            })
+        end
+    when "rhel"
+        # We need to disable SELinux as by default it does not allow creating
+        # file watches which is needed by dnsmasq.
+        # We need it disabled for Kubernetes too as it does not allow containers
+        # to access the host filesystem, which is required by pod networks for example.
+        bash 'disable_selinux' do
+            user 'root'
+            group 'root'
+            code <<-EOH
+                setenforce 0
+                sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+            EOH
+            only_if { node['install']['modify_selinux'].casecmp?("true") }
+        end
+
+        if node['install']['localhost'].casecmp?("true")
+            dnsmasq_ip = "127.0.0.1"
+        else
+            dnsmasq_ip = "127.0.0.1,#{my_ip}"
+        end
+
+        template "/etc/dnsmasq.d/default" do
+            source "dnsmasq-conf.erb"
+            owner 'root'
+            group 'root'
+            mode 0755
+            variables({
+                :resolv_conf => dnsmasq_resolv_file,
+                :dnsmasq_ip => dnsmasq_ip,
+                :kubernetes_dns => kubernetes_dns,
+                :kubernetes_domain_name => kubernetes_domain_name
+            })
+        end
+    end
+
+    systemd_unit "dnsmasq.service" do
+        action :restart
     end
 end
 
