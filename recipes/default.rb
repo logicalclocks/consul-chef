@@ -169,7 +169,7 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
     end
 
     systemd_unit "dnsmasq.service" do
-        action :restart
+        action [:enable, :restart]
     end
 end
 
