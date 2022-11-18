@@ -1,6 +1,9 @@
 # Install and configure dnsmasq
 if node['consul']['use_dnsmasq'].casecmp?("true")
-    package 'dnsmasq'
+    package 'dnsmasq' do
+        retries 10
+        retry_delay 30
+    end
 
     kubernetes_dns = nil
     kubernetes_domain_name = nil
