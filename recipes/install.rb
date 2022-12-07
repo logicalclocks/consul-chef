@@ -86,7 +86,10 @@ remote_file cached_file do
     action :create
 end
 
-package "unzip"
+package "unzip" do
+    retries 10
+    retry_delay 30
+end
 
 bash "unzip Consul" do
     user node['consul']['user']

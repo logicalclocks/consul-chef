@@ -33,7 +33,10 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
         case node["platform_family"]
         when "debian"
             # Follow steps from here https://github.com/hashicorp/terraform-aws-consul/tree/master/modules
-            package "iptables-persistent"
+            package "iptables-persistent" do
+                retries 10
+                retry_delay 30
+            end
 
             bash "Set debconf" do
                 user 'root'
