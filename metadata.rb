@@ -51,6 +51,10 @@ attribute "consul/effective_resolv_conf",
 attribute "consul/http_api_port",
           :description => "Port of agent HTTP API",
           :type => 'string'
+
+attribute "consul/rpc_port",
+          :description => "RPC Server port",
+          :type => 'string'
         
 attribute "consul/domain",
           :description => "Domain to be handled by Consul",

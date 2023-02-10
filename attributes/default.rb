@@ -14,6 +14,7 @@ default['consul']['use_dnsmasq']                = "true"
 default['consul']['configure_resolv_conf']      = "true"
 default['consul']['effective_resolv_conf']      = ""
 default['consul']['http_api_port']              = "8501"
+default['consul']['rpc_port']                   = "8300"
 default['consul']['domain']                     = "consul"
 
 default['consul']['bind_address']               = ""
