@@ -51,6 +51,10 @@ attribute "consul/effective_resolv_conf",
 attribute "consul/http_api_port",
           :description => "Port of agent HTTP API",
           :type => 'string'
+
+attribute "consul/rpc_port",
+          :description => "RPC Server port",
+          :type => 'string'
         
 attribute "consul/domain",
           :description => "Domain to be handled by Consul",
@@ -90,4 +94,8 @@ attribute "consul/health-check/max-attempts",
 
 attribute "consul/health-check/multiplier",
           :description => "If a health check fails it will retry for max-attempts before being declared as dead. This attribute controls the sleep interval between consecutive attempts",
+          :type => 'string'
+
+attribute "consul/metrics/prometheus_retention_time",
+          :description => "Retention time for Prometheus metrics",
           :type => 'string'

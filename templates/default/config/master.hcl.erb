@@ -23,5 +23,10 @@ cert_file = "<%= @certificate %>"
 key_file = "<%= @key %>"
 ports = {
    http = -1,
-   https = <%= node['consul']['http_api_port'] %>
+   https = <%= node['consul']['http_api_port'] %>,
+   server = <%= node['consul']['rpc_port'] %>
+}
+telemetry = {
+   prometheus_retention_time = "<%= node['consul']['metrics']['prometheus_retention_time'] %>",
+   disable_hostname = true
 }

@@ -14,6 +14,7 @@ default['consul']['use_dnsmasq']                = "true"
 default['consul']['configure_resolv_conf']      = "true"
 default['consul']['effective_resolv_conf']      = ""
 default['consul']['http_api_port']              = "8501"
+default['consul']['rpc_port']                   = "8300"
 default['consul']['domain']                     = "consul"
 
 default['consul']['bind_address']               = ""
@@ -30,3 +31,5 @@ default['consul']['master']['ui']               = "true"
 default['consul']['health-check']['retryable-check-file'] = "#{node['consul']['bin_dir']}/retryable_health_check.sh"
 default['consul']['health-check']['max-attempts']         = 7
 default['consul']['health-check']['multiplier']           = 1.2
+
+default['consul']['metrics']['prometheus_retention_time'] = "1m"
