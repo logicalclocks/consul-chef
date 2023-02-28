@@ -184,7 +184,7 @@ end
 execute "Set systemd Restart policy for dnsmasq service" do
     user "root"
     group "root"
-    command "systemd-run --collect --service-type=oneshot --pty --setenv=SYSTEMD_EDITOR=tee -- bash -c 'echo -e \"[Unit]\nStartLimitIntervalSec=30\nStartLimitBurst=20\n[Service]\nRestart=on-failure\nRestartSec=2\" | systemctl edit dnsmasq.service' < /dev/null"
+    command "systemd-run --service-type=oneshot -t --setenv=SYSTEMD_EDITOR=tee -- bash -c 'echo -e \"[Unit]\nStartLimitIntervalSec=30\nStartLimitBurst=20\n[Service]\nRestart=on-failure\nRestartSec=2\" | systemctl edit dnsmasq.service' < /dev/null"
     only_if { node['consul']['systemd_restart_dnsmasq'].casecmp?("true") }
 end
 
