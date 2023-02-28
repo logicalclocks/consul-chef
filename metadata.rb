@@ -40,6 +40,10 @@ attribute "consul/use_dnsmasq",
           :description => "Flag to control installation of dnsmasq. If set to false, DNS service discovery will NOT work",
           :type => 'string'
 
+attribute "consul/systemd_restart_dnsmasq",
+          :description => "Flag to enable/disable systemd restarting dnsmasq in case of failure. Default: true",
+          :type => 'string'
+
 attribute "consul/configure_resolv_conf",
           :description => "Let cookbook configure dnsmasq resolv.conf",
           :type => 'string'

@@ -179,6 +179,15 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
     end
 end
 
+# That is a hack to overcome the requirement for tty of systemctl edit
+# Inspiration https://github.com/systemd/systemd/issues/21862#issuecomment-999886443
+execute "Set systemd Restart policy for dnsmasq service" do
+    user "root"
+    group "root"
+    command "systemd-run --collect --service-type=oneshot --pty --setenv=SYSTEMD_EDITOR=tee -- bash -c 'echo -e \"[Unit]\nStartLimitIntervalSec=30\nStartLimitBurst=20\n[Service]\nRestart=on-failure\nRestartSec=2\" | systemctl edit dnsmasq.service' < /dev/null"
+    only_if { node['consul']['systemd_restart_dnsmasq'].casecmp?("true") }
+end
+
 crypto_dir = x509_helper.get_crypto_dir(node['consul']['user'])
 hops_ca = "#{crypto_dir}/#{x509_helper.get_hops_ca_bundle_name()}"
 certificate = "#{crypto_dir}/#{x509_helper.get_certificate_bundle_name(node['consul']['user'])}"

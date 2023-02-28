@@ -11,6 +11,7 @@ default['consul']['bin_dir']                    = "#{node['consul']['home']}/bin
 default['consul']['version']                    = "1.7.0"
 default['consul']['bin_url']                    = "#{node['download_url']}/consul/consul_#{node['consul']['version']}_linux_amd64.zip"
 default['consul']['use_dnsmasq']                = "true"
+default['consul']['systemd_restart_dnsmasq']    = "true"
 default['consul']['configure_resolv_conf']      = "true"
 default['consul']['effective_resolv_conf']      = ""
 default['consul']['http_api_port']              = "8501"
