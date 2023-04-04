@@ -140,20 +140,6 @@ if node['consul']['use_dnsmasq'].casecmp?("true")
             })
         end
     when "rhel"
-        # We need to disable SELinux as by default it does not allow creating
-        # file watches which is needed by dnsmasq.
-        # We need it disabled for Kubernetes too as it does not allow containers
-        # to access the host filesystem, which is required by pod networks for example.
-        bash 'disable_selinux' do
-            user 'root'
-            group 'root'
-            code <<-EOH
-                setenforce 0
-                sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
-            EOH
-            only_if { node['install']['modify_selinux'].casecmp?("true") }
-        end
-
         if node['install']['localhost'].casecmp?("true")
             dnsmasq_ip = "127.0.0.1"
         else

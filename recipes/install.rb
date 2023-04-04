@@ -76,6 +76,22 @@ directory node['consul']['bin_dir'] do
     mode "751"
 end
 
+case node["platform_family"]
+when "rhel"
+    # SELinux blocks a lot of operations that are necessary in Hopsworks
+    # for example file watchers for dnsmasq, systemd scripts, Kubernetes etc
+    # Until we have our own SELinux modules we disable it, unless instructed otherwise
+    bash 'disable_selinux' do
+        user 'root'
+        group 'root'
+        code <<-EOH
+            setenforce 0
+            sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+        EOH
+        only_if { node['install']['modify_selinux'].casecmp?("true") }
+    end
+end
+
 basename = File.basename(node['consul']['bin_url'])
 cached_file = "#{Chef::Config['file_cache_path']}/#{basename}"
 remote_file cached_file do
