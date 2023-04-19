@@ -203,7 +203,7 @@ bash "export security env variables for client" do
         echo "export CONSUL_HTTP_ADDR=https://127.0.0.1:#{node['consul']['http_api_port']}" >> .bashrc
         echo "export CONSUL_TLS_SERVER_NAME=#{consul_tls_server_name}" >> .bashrc
     EOH
-    not_if "grep CONSUL_TLS_SERVER_NAME #{node['consul']['home']}"
+    not_if "grep CONSUL_TLS_SERVER_NAME #{node['consul']['home']}/.bashrc"
 end
 
 template node['consul']['health-check']['retryable-check-file'] do
