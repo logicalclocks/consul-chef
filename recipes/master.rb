@@ -32,3 +32,15 @@ template "#{node['consul']['conf_dir']}/consul.hcl" do
 end
 
 include_recipe "consul::start"
+
+bash 'wait-for-agent' do
+    user node['consul']['user']
+    group node['consul']['group']
+    timeout 250
+    code <<-EOH
+        #{node['consul']['bin_dir']}/agent_waiter.sh
+    EOH
+    # Baking images for RonDB@Cloud we don't issue certificates so waiter will always fail.
+    # In this case we set kagent/enabled: false
+    only_if { node['kagent']['enabled'].casecmp?("true") }
+end

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+CERTIFICATE=<%= @certificate %>
+KEY=<%= @key %>
+
+i=0
+while true
+do
+    response=$(curl -k -s --fail --cert $CERTIFICATE --key $KEY https://127.0.0.1:<%= node['consul']['http_api_port'] %>/v1/agent/self)
+    if [ $? -eq "0" ]
+    then
+        status=$(echo $response | jq -r ".Member.Status")
+        if [ $status -eq "1" ]
+        then
+            exit 0
+        fi
+    fi
+    echo "Local Consul agent is not running/healthy"
+    let i++
+    if [ $i -gt 100 ]
+    then
+        echo "Exhausted all retries"
+        exit 1
+    fi
+    sleep 2s
+done

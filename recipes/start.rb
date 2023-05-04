@@ -32,6 +32,11 @@ systemd_unit "consul.service" do
     action [:start]
 end
 
+systemd_unit "consul.service" do
+    action [:restart]
+    only_if { conda_helpers.is_upgrade }
+end
+
 if node['kagent']['enabled'].casecmp?("true")
     kagent_config "consul" do
       service "Consul"

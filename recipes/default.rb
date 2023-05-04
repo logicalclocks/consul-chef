@@ -219,3 +219,14 @@ cookbook_file "#{node['consul']['bin_dir']}/domain_utils.sh" do
     group node['consul']['group']
     mode '0755'
 end
+
+template "#{node['consul']['bin_dir']}/agent_waiter.sh" do
+    source "agent_waiter.sh.erb"
+    owner node['consul']['user']
+    group node['consul']['group']
+    mode 0750
+    variables({
+        :certificate => certificate,
+        :key => key
+    })
+end
