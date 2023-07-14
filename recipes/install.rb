@@ -110,7 +110,7 @@ end
 bash "unzip Consul" do
     user node['consul']['user']
     group node['consul']['group']
-    umask 227
+    umask '227'
     code <<-EOH
         set -e
         rm -f #{node['consul']['bin_dir']}/consul
