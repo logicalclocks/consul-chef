@@ -25,3 +25,5 @@ telemetry = {
    prometheus_retention_time = "<%= node['consul']['metrics']['prometheus_retention_time'] %>",
    disable_hostname = true
 }
+log_file = "<%= node['consul']['logs_dir'] %>/consul"
+log_rotate_max_files = 7
