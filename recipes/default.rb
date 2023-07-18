@@ -1,8 +1,50 @@
+directory node['consul']['data_volume']['root_dir'] do
+    owner node['consul']['user']
+    group node['consul']['group']
+    mode "0750"
+    action :create
+end
+
+directory node['consul']['data_volume']['logs_dir'] do
+    owner node['consul']['user']
+    group node['consul']['group']
+    mode "0750"
+    action :create
+end
+
+link node['consul']['logs_dir'] do
+    owner node['consul']['user']
+    group node['consul']['group']
+    mode "0750"
+    to node['consul']['data_volume']["logs_dir"]
+end
+
 # Install and configure dnsmasq
 if node['consul']['use_dnsmasq'].casecmp?("true")
     package 'dnsmasq' do
         retries 10
         retry_delay 30
+    end
+
+    directory node['dnsmasq']['data_volume']['root_dir'] do
+        owner 'root'
+        group 'root'
+        mode "0750"
+        action :create
+    end
+    
+    directory node['dnsmasq']['data_volume']['logs_dir'] do
+        owner 'root'
+        group 'root'
+        mode "0750"
+        action :create
+    end
+    
+    link node['dnsmasq']['logs_dir'] do
+        owner 'root'
+        group 'root'
+        mode "0750"
+        to node['dnsmasq']['data_volume']["logs_dir"]
     end
 
     kubernetes_dns = nil
