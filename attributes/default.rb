@@ -8,7 +8,7 @@ default['consul']['data_volume']['root_dir']    = "#{node['data']['dir']}/consul
 default['consul']['data_volume']['logs_dir']    = "#{node['consul']['data_volume']['root_dir']}/logs"
 
 default['dnsmasq']['data_volume']['root_dir']   = "#{node['data']['dir']}/dnsmasq"
-default['dnsmasq']['data_volume']['logs_dir']   = "#{node['dnsmaq']['data_volume']['root_dir']}/logs"
+default['dnsmasq']['data_volume']['logs_dir']   = "#{node['dnsmasq']['data_volume']['root_dir']}/logs"
 default['dnsmasq']['home']                      = "#{node['consul']['dir']}/dnsmasq"
 default['dnsmasq']['logs_dir']                  = "#{node['dnsmasq']['home']}/logs"
 
