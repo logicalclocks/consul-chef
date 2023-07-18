@@ -7,6 +7,7 @@ no-resolv
 bind-interfaces
 listen-address=<%= @dnsmasq_ip %>
 server=/<%= node['consul']['domain'] %>/127.0.0.1#8600
+log-facility=<%= node['dnsmasq']['logs_dir'] %>/dnsmasq.log
 <% if !@kubernetes_dns.nil? -%>
 server=/<%= @kubernetes_domain_name %>/<%= @kubernetes_dns %>#53
 <% end -%>

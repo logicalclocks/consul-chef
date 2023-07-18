@@ -118,3 +118,9 @@ bash "unzip Consul" do
         chmod 750 #{node['consul']['bin_dir']}/consul
     EOH
 end
+
+directory node['dnsmasq']['home'] do
+    owner 'root'
+    group 'root'
+    mode 0750
+end
