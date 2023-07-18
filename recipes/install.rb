@@ -102,7 +102,7 @@ remote_file cached_file do
     action :create
 end
 
-package "unzip" do
+package ["unzip", "bc"] do
     retries 10
     retry_delay 30
 end
