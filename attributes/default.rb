@@ -3,10 +3,20 @@ default['consul']['user_id']                    = '1500'
 default['consul']['group']                      = node['install']['user'].empty? ? 'consul' : node['install']['user']
 default['consul']['group_id']                   = '1500'
 default['consul']["dir"]                        = node['install']['dir'].empty? ? "/srv/hops" : node['install']['dir']
+
+default['consul']['data_volume']['root_dir']    = "#{node['data']['dir']}/consul"
+default['consul']['data_volume']['logs_dir']    = "#{node['consul']['data_volume']['root_dir']}/logs"
+
+default['dnsmasq']['data_volume']['root_dir']   = "#{node['data']['dir']}/dnsmasq"
+default['dnsmasq']['data_volume']['logs_dir']   = "#{node['dnsmasq']['data_volume']['root_dir']}/logs"
+default['dnsmasq']['home']                      = "#{node['consul']['dir']}/dnsmasq"
+default['dnsmasq']['logs_dir']                  = "#{node['dnsmasq']['home']}/logs"
+
 default['consul']['home']                       = "#{node['consul']['dir']}/consul"
 default['consul']['conf_dir']                   = "#{node['consul']['home']}/consul.d"
 default['consul']['data_dir']                   = "#{node['consul']['home']}/data_dir"
 default['consul']['bin_dir']                    = "#{node['consul']['home']}/bin"
+default['consul']['logs_dir']                   = "#{node['consul']['home']}/logs"
 
 default['consul']['version']                    = "1.7.0"
 default['consul']['bin_url']                    = "#{node['download_url']}/consul/consul_#{node['consul']['version']}_linux_amd64.zip"
