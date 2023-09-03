@@ -27,6 +27,7 @@ default['consul']['effective_resolv_conf']      = ""
 default['consul']['http_api_port']              = "8501"
 default['consul']['rpc_port']                   = "8300"
 default['consul']['domain']                     = "consul"
+default['consul']['datacenter']                 = "lc"
 
 default['consul']['bind_address']               = ""
 # Default bind to localhost but accepts any go-sockaddr template
@@ -42,3 +43,7 @@ default['consul']['health-check']['max-attempts']         = 7
 default['consul']['health-check']['multiplier']           = 1.2
 
 default['consul']['metrics']['prometheus_retention_time'] = "1m"
+
+default['consul']['wan']['enabled']                = "false"
+default['consul']['wan']['serf_port']              = "8302"
+default['consul']['wan']['nodes']                  = nil
