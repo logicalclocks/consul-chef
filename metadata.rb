@@ -59,9 +59,25 @@ attribute "consul/http_api_port",
 attribute "consul/rpc_port",
           :description => "RPC Server port",
           :type => 'string'
+
+attribute "consul/wan/enabled",
+          :description => "Enable Consul WAN federation across datacenters (Default: false)",
+          :type => 'string'
+
+attribute "consul/wan/enabled",
+          :description => "Enable Consul WAN federation across datacenters (Default: false)",
+          :type => 'string'
+
+attribute "consul/wan/nodes",
+          :description => "If WAN federation enabled, nodes to include in the federation",
+          :type => 'string'
         
 attribute "consul/domain",
           :description => "Domain to be handled by Consul",
+          :type => 'string'
+
+attribute "consul/datacenter",
+          :description => "Datacenter configuration (Default: lc)",
           :type => 'string'
 
 attribute "consul/bind_address",

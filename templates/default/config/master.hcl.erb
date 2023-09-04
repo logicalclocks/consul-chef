@@ -1,10 +1,15 @@
-datacenter = "lc"
+datacenter = "<%= node['consul']['datacenter'] %>"
 domain = "<%= node['consul']['domain'] %>"
 server = true
 <% if !@masters.nil? -%>
 retry_join = <%= @masters %>
 <% end -%>
 bootstrap_expect = <%= @num_masters %>
+
+<% if !node['consul']['wan']['nodes'].nil? -%>
+retry_join_wan = <%= node['consul']['wan']['nodes'] %>
+<% end -%>
+
 ui = <%= node['consul']['master']['ui'] %>
 data_dir = "<%= node['consul']['data_dir'] %>"
 enable_local_script_checks = true
@@ -24,7 +29,8 @@ key_file = "<%= @key %>"
 ports = {
    http = -1,
    https = <%= node['consul']['http_api_port'] %>,
-   server = <%= node['consul']['rpc_port'] %>
+   server = <%= node['consul']['rpc_port'] %>,
+   serf_wan = <%= node['consul']['wan']['serf_port'] %>
 }
 telemetry = {
    prometheus_retention_time = "<%= node['consul']['metrics']['prometheus_retention_time'] %>",
