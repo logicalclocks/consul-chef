@@ -1,4 +1,4 @@
-datacenter = "lc"
+datacenter = "<%= node['consul']['datacenter'] %>"
 domain = "<%= node['consul']['domain'] %>"
 data_dir = "<%= node['consul']['data_dir'] %>"
 retry_join = <%= @masters %>
