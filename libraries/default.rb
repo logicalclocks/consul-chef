@@ -56,7 +56,7 @@ class ConsulHelper
             prefix = "#{prefix}."
         end
         datacenter = ""
-        if @node['consul']['use_datacenter']
+        if @node['consul']['use_datacenter'].casecmp?("true")
             datacenter = "#{@node['consul']['datacenter']}."
         end
         "#{prefix}service.#{datacenter}#{@node['consul']['domain']}"
