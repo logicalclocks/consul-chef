@@ -28,6 +28,7 @@ default['consul']['http_api_port']              = "8501"
 default['consul']['rpc_port']                   = "8300"
 default['consul']['domain']                     = "consul"
 default['consul']['datacenter']                 = "lc"
+default['consul']['use_datacenter']             = "false"
 
 default['consul']['bind_address']               = ""
 # Default bind to localhost but accepts any go-sockaddr template
