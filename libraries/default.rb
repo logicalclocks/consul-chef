@@ -55,7 +55,7 @@ class ConsulHelper
         unless prefix.end_with?(".")
             prefix = "#{prefix}."
         end
-        "#{prefix}service.#{@node['consul']['domain']}"
+        "#{prefix}service.#{@node['consul']['datacenter']}.#{@node['consul']['domain']}"
     end
 end
 
