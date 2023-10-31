@@ -80,6 +80,10 @@ attribute "consul/datacenter",
           :description => "Datacenter configuration (Default: lc)",
           :type => 'string'
 
+attribute "consul/use_datacenter",
+          :description => "Whether or not to inject the datacenter in the Consul FQND (Default: False)",
+          :type => 'string'
+
 attribute "consul/bind_address",
           :description => "IP address Consul agent will bind to. You can also set a go-sockaddr template. Check https://www.consul.io/docs/agent/options.html#_bind for more information.",
           :type => 'string'
