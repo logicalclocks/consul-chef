@@ -55,7 +55,11 @@ class ConsulHelper
         unless prefix.end_with?(".")
             prefix = "#{prefix}."
         end
-        "#{prefix}service.#{@node['consul']['domain']}"
+        datacenter = ""
+        if @node['consul']['use_datacenter'].casecmp?("true")
+            datacenter = "#{@node['consul']['datacenter']}."
+        end
+        "#{prefix}service.#{datacenter}#{@node['consul']['domain']}"
     end
 end
 
