@@ -48,3 +48,8 @@ default['consul']['metrics']['prometheus_retention_time'] = "1m"
 default['consul']['wan']['enabled']                = "false"
 default['consul']['wan']['serf_port']              = "8302"
 default['consul']['wan']['nodes']                  = nil
+
+# 7 days
+default['consul']['log_rotate_max_files']   = "7"
+# 300mb
+default['consul']['log_rotate_bytes']       = "314572800"
