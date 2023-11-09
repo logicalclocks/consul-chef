@@ -123,3 +123,11 @@ attribute "consul/health-check/multiplier",
 attribute "consul/metrics/prometheus_retention_time",
           :description => "Retention time for Prometheus metrics",
           :type => 'string'
+
+attribute "consul/log_rotate_max_files",
+          :description => "Maximum number of older log file archives to keep. Default: 7",
+          :type => 'string'
+
+attribute "consul/log_rotate_bytes",
+          :description => "number of bytes that should be written to a log before it needs to be rotated. Default: 300mb",
+          :type => 'string'
