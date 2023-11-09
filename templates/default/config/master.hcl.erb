@@ -37,4 +37,5 @@ telemetry = {
    disable_hostname = true
 }
 log_file = "<%= node['consul']['logs_dir'] %>/consul"
-log_rotate_max_files = 7
+log_rotate_max_files = <%= node['consul']['log_rotate_max_files'] %>
+log_rotate_bytes = <%= node['consul']['log_rotate_bytes'] %>
