@@ -3,7 +3,7 @@ Description="HashiCorp Consul - A service mesh solution"
 Documentation=https://www.consul.io/
 Wants=nss-lookup.target nss-user-lookup.target
 Requires=network-online.target
-After=network-online.target nss-lookup.target nss-user-lookup.target
+After=network-online.target nss-lookup.target nss-user-lookup.target <%= node['install']['systemd']['after'] %>
 ConditionFileNotEmpty=<%= node['consul']['conf_dir'] %>/consul.hcl
 StartLimitIntervalSec=30
 StartLimitBurst=20
